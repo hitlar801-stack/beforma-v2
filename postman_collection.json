@@ -1,0 +1,31 @@
+{
+  "info": {
+    "name": "BeForma Nutrition Final API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8000"}
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {"method": "GET", "url": "{{baseUrl}}/health"}
+    },
+    {
+      "name": "Generate Plan - Main Backend Endpoint",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "url": "{{baseUrl}}/generate-plan",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Ibrahim\",\n  \"email\": \"test@example.com\",\n  \"phone\": \"01000000000\",\n  \"age\": 24,\n  \"gender\": \"male\",\n  \"height\": 178,\n  \"weight\": 82,\n  \"fitnessGoal\": \"lose\",\n  \"activityLevel\": \"Sedentary\",\n  \"experienceLevel\": \"Beginner\",\n  \"workoutLocation\": \"Home\",\n  \"dietaryPreference\": \"normal\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Meals Catalog",
+      "request": {"method": "GET", "url": "{{baseUrl}}/api/v1/nutrition/meals?limit=10"}
+    }
+  ]
+}
