@@ -21,7 +21,7 @@ from nutrition import activity_factor, calculate_bmi, generate_nutrition_plan, n
 from recommender import get_feedback_stats, get_meal_tags, rank_meals_for_goal, record_feedback, suggest_substitutions
 from validator import validate_plan
 
-API_VERSION = "2.0.0-final"
+API_VERSION = "2.1.0-gain-bulk-fix"
 API_KEY = os.getenv("BEFORMA_NUTRITION_API_KEY", "")
 ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()]
 INIT_DB_ON_STARTUP = os.getenv("INIT_DB_ON_STARTUP", "true").lower() == "true"
@@ -29,7 +29,7 @@ INIT_DB_ON_STARTUP = os.getenv("INIT_DB_ON_STARTUP", "true").lower() == "true"
 Goal = Literal["lose", "maintain", "gain"]
 Gender = Literal["male", "female", "other", "m", "f"]
 Strategy = Literal["strict", "flexible"]
-MealType = Literal["breakfast", "lunch", "dinner"]
+MealType = Literal["breakfast", "lunch", "dinner", "snack"]
 
 app = FastAPI(
     title="BeForma Nutrition API",
@@ -98,7 +98,7 @@ class UserNutritionInput(BaseModel):
 
 
 class MealPlanRequest(UserNutritionInput):
-    num_meals: int = Field(3, ge=3, le=3, examples=[3])
+    num_meals: int = Field(3, ge=3, le=5, examples=[4])
     strategy: Strategy = Field("strict", examples=["strict"])
     dietary_preference: str = Field("normal", examples=["normal"])
 
@@ -153,6 +153,23 @@ def build_workout_plan(fitness_goal: str, experience_level: str, workout_locatio
         "sample_exercises": exercises,
         "message": "Workout plan placeholder is generated from profile data and can be replaced by the workout module.",
     }
+
+
+
+def choose_num_meals_for_client(goal: str, activity_level: str, experience_level: str) -> int:
+    """Choose meal count automatically for the simple /generate-plan endpoint.
+
+    Gain/bulk users need more feeding opportunities, so they get 4-5 meals
+    instead of the old 3-meal plan. Very active or non-beginner users get 5.
+    """
+    goal_norm = normalize_goal(goal)
+    activity = (activity_level or "").strip().lower()
+    level = (experience_level or "").strip().lower()
+    if goal_norm == "gain":
+        if any(word in activity for word in ["very", "super", "athlete", "active"]) or level in {"intermediate", "advanced"}:
+            return 5
+        return 4
+    return 3
 
 
 def save_generated_plan(request_id: str, payload: GeneratePlanRequest, response: dict) -> None:
@@ -214,7 +231,7 @@ def generate_plan(payload: GeneratePlanRequest) -> dict:
     """Main endpoint for Flutter/backend integration.
 
     Receives the exact camelCase request from the client and returns BMI, calories, macros,
-    3 meals with images, and a workout placeholder.
+    3-5 meals with images, and a workout placeholder.
     """
     request_id = str(uuid.uuid4())
     t0 = time.perf_counter()
@@ -230,9 +247,10 @@ def generate_plan(payload: GeneratePlanRequest) -> dict:
         activity_level=factor,
         goal=goal,
     )
+    num_meals = choose_num_meals_for_client(payload.fitnessGoal, payload.activityLevel, payload.experienceLevel)
     full_plan = generate_full_meal_plan(
         nutrition_plan=nutrition_plan,
-        num_meals=3,
+        num_meals=num_meals,
         strategy="strict",
         dietary_preference=payload.dietaryPreference,
     )
@@ -271,6 +289,8 @@ def generate_plan(payload: GeneratePlanRequest) -> dict:
             "activity_factor": factor,
             "normalized_goal": goal,
             "dietary_preference": payload.dietaryPreference,
+            "num_meals": num_meals,
+            "meal_count_policy": "gain/bulk uses 4-5 meals; lose/maintain uses 3 meals",
             "elapsed_ms": round((time.perf_counter() - t0) * 1000, 1),
             "catalog_meals_count": len(MEALS_DB),
         },
