@@ -21,7 +21,7 @@ from nutrition import activity_factor, calculate_bmi, generate_nutrition_plan, n
 from recommender import get_feedback_stats, get_meal_tags, rank_meals_for_goal, record_feedback, suggest_substitutions
 from validator import validate_plan
 
-API_VERSION = "2.1.0-gain-bulk-fix"
+API_VERSION = "2.1.1-no-contact-fields"
 API_KEY = os.getenv("BEFORMA_NUTRITION_API_KEY", "")
 ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "*").split(",") if o.strip()]
 INIT_DB_ON_STARTUP = os.getenv("INIT_DB_ON_STARTUP", "true").lower() == "true"
@@ -62,9 +62,6 @@ def require_api_key(x_api_key: Optional[str] = Header(default=None)) -> None:
 
 
 class GeneratePlanRequest(BaseModel):
-    name: str = Field(..., examples=["Ibrahim"])
-    email: str = Field(..., examples=["ibrahim@example.com"])
-    phone: str = Field(..., examples=["01000000000"])
     age: int = Field(..., ge=10, le=100, examples=[24])
     gender: str = Field(..., examples=["male"])
     height: float = Field(..., ge=100, le=250, description="Height in cm", examples=[178])
@@ -177,9 +174,6 @@ def save_generated_plan(request_id: str, payload: GeneratePlanRequest, response:
         with db_session() as db:
             db.add(GeneratedPlan(
                 request_id=request_id,
-                name=payload.name,
-                email=payload.email,
-                phone=payload.phone,
                 age=payload.age,
                 gender=payload.gender,
                 height=payload.height,
@@ -259,9 +253,6 @@ def generate_plan(payload: GeneratePlanRequest) -> dict:
         "request_id": request_id,
         "status": "success",
         "user": {
-            "name": payload.name,
-            "email": payload.email,
-            "phone": payload.phone,
             "age": payload.age,
             "gender": payload.gender,
             "height": payload.height,
