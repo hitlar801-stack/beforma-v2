@@ -33,9 +33,6 @@ if SQLALCHEMY_AVAILABLE:
         __tablename__ = "generated_plans"
         id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
         request_id: Mapped[str] = mapped_column(String(64), index=True)
-        name: Mapped[str | None] = mapped_column(String(255), nullable=True)
-        email: Mapped[str | None] = mapped_column(String(255), nullable=True)
-        phone: Mapped[str | None] = mapped_column(String(64), nullable=True)
         age: Mapped[int | None] = mapped_column(Integer, nullable=True)
         gender: Mapped[str | None] = mapped_column(String(32), nullable=True)
         height: Mapped[float | None] = mapped_column(Float, nullable=True)

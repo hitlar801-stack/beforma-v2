@@ -19,7 +19,7 @@
         "url": "{{baseUrl}}/generate-plan",
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"name\": \"Ibrahim\",\n  \"email\": \"test@example.com\",\n  \"phone\": \"01000000000\",\n  \"age\": 24,\n  \"gender\": \"male\",\n  \"height\": 178,\n  \"weight\": 82,\n  \"fitnessGoal\": \"lose\",\n  \"activityLevel\": \"Sedentary\",\n  \"experienceLevel\": \"Beginner\",\n  \"workoutLocation\": \"Home\",\n  \"dietaryPreference\": \"normal\"\n}"
+          "raw": "{\n  \"age\": 24,\n  \"gender\": \"male\",\n  \"height\": 178,\n  \"weight\": 82,\n  \"fitnessGoal\": \"lose\",\n  \"activityLevel\": \"Sedentary\",\n  \"experienceLevel\": \"Beginner\",\n  \"workoutLocation\": \"Home\",\n  \"dietaryPreference\": \"normal\"\n}"
         }
       }
     },

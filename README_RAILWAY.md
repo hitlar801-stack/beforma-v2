@@ -12,9 +12,6 @@ This endpoint is public and does not require an API key.
 
 ```json
 {
-  "name": "Ibrahim",
-  "email": "test@example.com",
-  "phone": "01000000000",
   "age": 24,
   "gender": "male",
   "height": 178,

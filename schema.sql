@@ -2,9 +2,6 @@
 CREATE TABLE IF NOT EXISTS generated_plans (
     id SERIAL PRIMARY KEY,
     request_id VARCHAR(64),
-    name VARCHAR(255),
-    email VARCHAR(255),
-    phone VARCHAR(64),
     age INTEGER,
     gender VARCHAR(32),
     height FLOAT,
