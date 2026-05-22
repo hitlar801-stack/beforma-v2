@@ -1,16 +1,15 @@
 FROM python:3.11-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    MEAL_FEEDBACK_PATH=/data/meal_feedback.json
-
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-COPY . .
-RUN mkdir -p /data
+COPY beforma_workout_plan_api_package_50/requirements.txt .
 
-EXPOSE 8000
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+COPY beforma_workout_plan_api_package_50/ .
+
+CMD sh -c "python -m uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"
