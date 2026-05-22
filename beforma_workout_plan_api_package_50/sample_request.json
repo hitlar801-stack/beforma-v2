@@ -1,0 +1,12 @@
+{
+  "age": 24,
+  "weight_kg": 78,
+  "activity_level": "moderately_active",
+  "primary_goal": "lose_weight",
+  "injuries": [
+    "knee"
+  ],
+  "experience_level": "beginner",
+  "equipment": "gym",
+  "days_per_week": 4
+}
